@@ -1,0 +1,96 @@
+#simple {
+    height: 100%;
+    width: 100%;
+}
+
+ul.bells {
+    display: block;
+    position: relative;
+    width:100%;
+    height: 100%;
+    margin:0;
+    padding:0;
+}
+
+ul.bells ul {
+    display: block;
+    width:100%;
+    margin:0;
+    padding:0;
+}
+
+ul.bells ul li {
+    line-height: normal !important;
+    display:inline-block;
+}
+
+ul.bells ul li:nth-child(1) {
+    width:3em;
+    font-size: 60%
+}
+
+ul.bells ul li:nth-child(3) {
+    width:auto;
+    text-align:right;
+    float:right;
+}
+
+#simple {
+    font-size:200%;
+}
+#simple table.bells tr td {
+    height: 2em;
+}
+#simple table.bells tr td:nth-child(1) {
+    font-size: 60%
+}
+
+#simple table.bells tr td:nth-child(3) {
+    font-size:60%;
+}
+
+#simple span.letterAndSchedule {
+    display: inline-block;
+    float:right
+}
+#simple span.schedule {
+    font-size: 60%;
+}
+
+#simple span.schedule_Normal {
+    display: none;
+}
+
+
+table.bells {
+    width:100%;
+    height: 100%;
+    margin:0;
+    padding:0;
+}
+
+table.bells tr {
+    width:100%;
+    margin:0;
+    padding:0;
+    
+}
+
+table.bells tr td {
+    line-height: 150% !important;
+    vertical-align: middle;
+    height: 1.5em;
+}
+
+table.bells tr td:nth-child(1) {
+    width:5em;
+}
+
+table.bells tr td:nth-child(3) {
+    width:auto;
+    text-align:right;
+}
+
+#formProfile {
+    text-align:right;
+}

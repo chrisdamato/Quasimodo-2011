@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+
+	<!-- Basic Page Needs
+  ================================================== -->
+	<meta charset="utf-8">
+	<title>Quasimodo</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+	<!-- Mobile Specific Metas
+  ================================================== -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- CSS
+  ================================================== -->
+	<link rel="stylesheet" href="stylesheets/base.css">
+	<link rel="stylesheet" href="stylesheets/skeleton.css">
+	<link rel="stylesheet" href="stylesheets/layout.css">
+    
+	<link rel="stylesheet" href="stylesheets/quasimodo.css">
+    
+
+	<!-- Favicons
+	================================================== -->
+	<link rel="shortcut icon" href="images/favicon.ico">
+	<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+
+</head>
+<body>
+
+	<!-- Primary Page Layout
+	================================================== -->
+
+	<!-- Delete everything in this .container and get started on your own site! -->
+
+	<div id="app" class="container">
+        <div class="sixteen columns">
+            <h1 class="remove-bottom" style="margin-top: 40px">Quasimodo</h1>
+        </div>
+        <div class="ten columns">
+            <h5 class="add-bottom">Quick and simple Mount Olive daily organizer</h5>
+        </div>
+        <div class="six columns" id="divProfile">
+            
+            <form id="formProfile" action="">
+                <select id="selectProfile">
+                    <option value="blank">Ring the bells for ...</option>
+                </select>
+              <!-- Label and select list -->
+            </form>
+        </div>
+        <div class="sixteen columns">
+            <!-- Standard <ul> with class of "tabs" -->
+            <ul class="tabs" style="display:">
+              <!-- Give href an ID value of corresponding "tabs-content" <li>'s -->
+              <li><a class="active"  href="#simpleTab">Today</a></li>
+              <li><a href="#plannerTab">Planner</a></li>
+              <li><a href="#general">Countdown</a></li>
+              <li><a href="#other">Other</a></li>
+            </ul>
+            
+            <!-- Standard <ul> with class of "tabs-content" -->
+            <ul class="tabs-content">
+                <!-- Give ID that matches HREF of above anchors -->
+                <li class="active" id="simpleTab">
+                    <div class="ten columns offset-by-three">
+                        <div id="simple">
+                        </div>
+                    </div>
+                </li>
+                <li id="plannerTab">
+                    <div class="sixteen columns">
+                        <h3>Week</h3>
+                        <div id="Week">week</div>
+                    </div>
+                </li>
+                <li id="countdownTab">
+                    <div class="three columns">
+                        <h3>Now</h3>
+                        <h4>[Course name]</h4>
+                        <p>Ending in xx minutes.</p>
+                        <h3>Next</h3>
+                        <h4>End of day</h4>
+                        
+                    </div>
+                    <div class="seven columns offset-by-three">
+                        <div id="chrisDay">&nbsp;</div>
+                    </div>
+                </li>
+                <li id="roomTab">
+                </li>
+            </ul>
+        </div>
+        
+	</div><!-- container -->
+    
+    <!-- underscore-based templates -->
+
+    <script id="tmplDay" type="text/x-underscore-tmpl">
+        <h3 class='day'><span class='dayname'> <%= relativeDay() + date.toString("dddd M/d") %></span> 
+            <span class="letterAndSchedule"><span class="schedule schedule_<%= schedule.name.replace(" ","_") %>"><%= schedule.name %></span> <span class="letter letter_<%= Letter %>"><%= Letter %></span></span></h3>
+        <table class='bells'>
+                <% _.each(bells,function(b) { %>
+                <tr>
+                    <td class="label"><%= b.name %></td>
+                    <td class="name"><%= b.block.name || "" %></td>
+                    <td class="time"><%= b.Start %> - <%= b.End %></td>
+                </tr>
+                <% }); %>
+    </script>
+
+    <script id="UL-tmplDay" type="text/x-underscore-tmpl">
+        <h3 class='day'><span class='dayname'> <%= relativeDay() + date.toString("dddd M/d") %></span> 
+            <span class="schedule"><%= Letter %></span></h3>
+        <ul class='bells'>
+                <% _.each(bells,function(b) { %>
+                <ul>
+                    <li class="label"><%= b.name %></li>
+                    <li class="name"><%= b.block.name || "" %></li>
+                    <li class="time"><%= b.Start %> - <%= b.End %></li>
+                </ul>
+                <% }); %>
+        </ul>
+    </script>
+
+    <script id="tmplWeek" type="text/x-underscore-tmpl">
+        <div class="three columns">
+        <h4><%= date.toString("ddd M/d") %> <span class="schedule"><%= Letter %></span></h4>
+        <ul class='week'>
+            <% _.each(bells,function(b) { if (b.block.showInWeek) { %>
+                <ul>
+                    <li class="label"><%= b.name %></li>
+                    <li class="name"><%= b.block.name || "" %></li>
+                </ul>
+                <% } else if (b.block.name=='Lunch') { %>
+                    <hr class='lunch'/>
+                    <% } }); %>
+        </div>
+    </script>
+    
+    
+    
+
+	<!-- JS
+	================================================== -->
+	<script src="javascripts/jquery.min.js"></script>
+	<script src="javascripts/tabs.js"></script>
+	<script src="javascripts/underscore.js"></script>
+	<script src="javascripts/backbone.js"></script>
+	<script src="javascripts/backbone.localStorage.js"></script>
+	<script src="javascripts/date.js"></script>
+    
+    <script src="cal-2012-mvc.js"></script>
+
+<!-- End Document
+================================================== -->
+</body>
+</html>
