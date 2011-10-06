@@ -107,7 +107,7 @@
     <!-- underscore-based templates -->
 
     <script id="tmplDay" type="text/x-underscore-tmpl">
-        <h3 class='day'><span class='dayname'> <%= relativeDay() + date.toString("dddd M/d") %></span> 
+        <h3 class='day'><span class='dayname'> <%= relativeDay + date.toString("dddd M/d") %></span> 
             <span class="letterAndSchedule"><span class="schedule schedule_<%= schedule.name.replace(" ","_") %>"><%= schedule.name %></span> <span class="letter letter_<%= Letter %>"><%= Letter %></span></span></h3>
         <table class='bells'>
                 <% _.each(bells,function(b) { %>

@@ -36,17 +36,17 @@ ul.bells ul li:nth-child(3) {
 }
 
 #simple {
-    font-size:200%;
+    font-size:250%;
 }
 #simple table.bells tr td {
-    height: 2em;
+    height: 1.2em;
 }
 #simple table.bells tr td:nth-child(1) {
     font-size: 60%
 }
 
 #simple table.bells tr td:nth-child(3) {
-    font-size:60%;
+    font-size:80%;
 }
 
 #simple span.letterAndSchedule {
