@@ -241,26 +241,7 @@ chrisProfile.attributes.matrix[3].AM2=9;
 //Profiles.add(chrisProfile);
 //    })()
 
-window.Day=Backbone.Model.extend({
-    initialize: function() {
-        this.bind("change",this.updateFromMO);
-        },
-    defaults: function() {
-        return {
-            profile: Profiles.at(0),
-            date: Date.today()
-        }
-    },
-    updateFromMO: function() {
-        var oDate=(_.isUndefined(this.get('date')))? 
-            undefined :
-            Date.parse(this.get('date').toDateString());
-        var day=mo.day(oDate,this.get("profile").attributes);
-        day.bells=day.bells()
-        this.set(day);
-    } 
-})
-    
+
 window.DayView = Backbone.View.extend({
     tagName: "div",
     template: _.template($("#tmplDay").html()),
