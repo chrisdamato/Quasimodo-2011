@@ -54,6 +54,13 @@ window.MO = (function() {
             11: { name:'Full day 8', items:[['TAG',437,18], ['B1',460,40], ['B2',505,40], ['B3',550,40], ['B4',595,40], ['Lunch',635,45], ['B5',685,40], ['B6',730,40], ['B7',775,40], ['B8',820,40]] }
             }
         }
+        window.previousSchedule={}
+        _.each(year.bellSchedules,function(schedule, key, schedules){
+            schedule.previous=window.previousSchedule;
+            window.previousSchedule.next = schedule;
+            window.previousSchedule=schedule;
+        });
+        delete window.previousSchedule;
         var defaultProfile=function() {
             //return a new object that can be customized without bashing these dafaults
             return {
@@ -134,26 +141,33 @@ window.MO = (function() {
 
 window.BellringerModel=Backbone.Model.extend({
     initialize: function() {
-        this.bind("change:date",this.setDefaults, this);
+        this.bind("change:date",this.setLetterAndScheduleFromSchoolCalendar, this);
         this.bind("change:letter",this.updateBells, this);
         this.bind("change:schedule",this.updateBells, this);
         this.bind("change:profile",this.updateBells, this);
         this.set({
-            date: MO.thisSchoolDay()
-            })
-        },
-    setDefaults: function() {
+            date: MO.thisSchoolDay(),
+            profile: window.defaultProfile,
+            }, {silent: true} )
+        this.setLetterAndScheduleFromSchoolCalendar();
+        this.updateBells();
+    },
+    setLetterAndScheduleFromSchoolCalendar: function() {
         var date=this.attributes.date || MO.thisSchoolDay()
         this.set ( {
             date: date,
-            profile: window.defaultProfile,
             schedule: MO.getSchedule(date),
             letter: MO.getLetter(date),
             Letter: ['','A','B','C','D'][MO.getLetter(date)],
             relativeDay: this.relativeDay()
         }, {silent: true} )
         this.updateBells();
-        return this;
+        
+    },
+    nextSchedule: function() {
+        this.set({
+            schedule: this.attributes.schedule.next
+        })
     },
     relativeDay:function() {
         var objDate=this.get('date');
@@ -222,16 +236,16 @@ chrisProfile.set({
     id:"Chris DAmato",
     user: {
         name:"Chris D'Amato",
-        0:{name:'',block:0,moName:'TAG'},
-        1:{name:'Physics First 1',block:1,moName:'1(A) 2(D) 3(C)',showInWeek:true},
-        2:{name:'Study Hall',block:2,moName:'1(B) 2(A) 3(D)'},
-        3:{name:'Physics 3',block:3,moName:'1(C) 2(B) 3(A)',showInWeek:true},
-        4:{name:'Library',block:4,moName:'1(D) 2(C) 3(B)'},
+        0:{name:'',block:0,moName:''},
+        1:{name:'Physics First 1',block:1,moName:'',showInWeek:true},
+        2:{name:'Study Hall',block:2,moName:''},
+        3:{name:'Physics 3',block:3,moName:'',showInWeek:true},
+        4:{name:'Library',block:4,moName:')'},
         'Lunch': {name:'',block:-1,moName:'',showInWeek:true},
-        5:{name:'Prep',block:5,moName:'5(A) 6(D) 7(C)',showInWeek:true},
-        6:{name:'Physics First 6',block:6,moName:'5(B) 6(A) 7(D)',showInWeek:true},
-        7:{name:'Physics First 7',block:7,moName:'5(C) 6(B) 7(A)',showInWeek:true},
-        8:{name:'Physics First 8',block:8,moName:'5(D) 6(C) 7(B)',showInWeek:true},
+        5:{name:'Prep',block:5,moName:'',showInWeek:true},
+        6:{name:'Physics First 6',block:6,moName:'',showInWeek:true},
+        7:{name:'Physics First 7',block:7,moName:'',showInWeek:true},
+        8:{name:'Physics First 8',block:8,moName:'',showInWeek:true},
         9:{name:'PLC',block:-1,moName:'',showInWeek:true},
         'STAR':{name:'STAR',block:-1,moName:'',showInWeek:true},
         },
@@ -246,6 +260,7 @@ window.DayView = Backbone.View.extend({
     tagName: "div",
     template: _.template($("#tmplDay").html()),
     events: {
+        "click .letterAndSchedule"     : "incrementSchedule"
         },
     initialize: function() {
         this.model.bind("change", this.render, this)
@@ -253,7 +268,10 @@ window.DayView = Backbone.View.extend({
     render: function() {
         $(this.el).html(this.template(this.model.toJSON()));
         return this;
-        }
+        },
+    incrementSchedule: function() {
+        this.model.nextSchedule()
+    }
     })
     
 window.WeekModel = Backbone.Model.extend({

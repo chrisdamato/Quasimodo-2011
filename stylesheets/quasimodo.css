@@ -41,9 +41,16 @@ ul.bells ul li:nth-child(3) {
 
 #simple h3 {
     font-size: 120%;
+    margin-bottom: 0.5em;
 }
 #simple table.bells tr td {
     height: 1.2em;
+    vertical-align: center;
+}
+
+#simple table.bells td .moName {
+    font-size: 60%;
+    color: #777
 }
 #simple table.bells tr td:nth-child(1) {
     font-size: 60%;
@@ -82,7 +89,6 @@ table.bells tr {
 
 table.bells tr td {
     line-height: 150% !important;
-    vertical-align: middle;
     height: 1.5em;
 }
 
@@ -95,6 +101,11 @@ table.bells tr td:nth-child(3) {
     text-align:right;
 }
 
-#formProfile {
+#divProfile {
     text-align:right;
+}
+
+#selectProfile {
+    width: auto;
+    display: inline;
 }

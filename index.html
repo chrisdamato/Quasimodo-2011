@@ -53,6 +53,7 @@
         <div class="six columns" id="divProfile">
             
             <form id="formProfile" action="">
+                <span style="color:#777">Ring the bells for </span>
                 <select id="selectProfile">
                     <option value="blank">Ring the bells for ...</option>
                 </select>
@@ -61,7 +62,7 @@
         </div>
         <div class="sixteen columns">
             <!-- Standard <ul> with class of "tabs" -->
-            <ul class="tabs" style="display:">
+            <ul class="tabs" style="display:none">
               <!-- Give href an ID value of corresponding "tabs-content" <li>'s -->
               <li><a class="active"  href="#simpleTab">Today</a></li>
               <li><a href="#plannerTab">Planner</a></li>
@@ -113,7 +114,7 @@
                 <% _.each(bells,function(b) { %>
                 <tr>
                     <td class="label"><%= b.name %></td>
-                    <td class="name"><%= b.block.name || "" %></td>
+                    <td class="name"><%= b.block.name || "" %> <span class="moName"><%= b.block.moName %></span></td>
                     <td class="time"><%= b.Start %> - <%= b.End %></td>
                 </tr>
                 <% }); %>
