@@ -3,36 +3,76 @@
     width: 100%;
 }
 
-ul.bells {
-    display: block;
-    position: relative;
+table.bells {
     width:100%;
     height: 100%;
     margin:0;
     padding:0;
 }
 
-ul.bells ul {
-    display: block;
-    width:100%;
-    margin:0;
-    padding:0;
-}
-
-ul.bells ul li {
+table.bells td {
+  /*position: relative;*/
     line-height: normal !important;
-    display:inline-block;
 }
 
-ul.bells ul li:nth-child(1) {
-    width:3em;
-    font-size: 60%
+table.bells td {
+  /*border: 1px dotted #999;*/
+  vertical-align:middle;
 }
 
-ul.bells ul li:nth-child(3) {
-    width:auto;
-    text-align:right;
-    float:right;
+table.bells tr {
+  height:1.5em;
+}
+
+table.bells td.label {
+  width:20%;
+  font-size:60%;
+}
+
+table.bells td.name {
+  text-align:left;
+}
+table.bells td.name .display {
+  /* leave a little space for the edit box to appear */
+  margin-left:9px;
+}
+
+table.bells td.time {
+  text-align: right;
+  font-size:60%;
+  width:20%;
+}
+
+table.bells .edit,
+table.bells .editing .display {
+  display:none;
+}
+
+table.bells .editing .edit {
+  display:block;
+}
+
+table.bells .editing input {
+  /*width: 444px;*/
+  width:70%;
+  font-size: inherit;
+  font-family: inherit;
+  margin: 0;
+  /*line-height: 1.6em;*/
+  border: 0;
+  outline: none;
+  /*padding: 10px 7px 0px 27px;*/
+  padding: 0px 8px 0px 8px;
+  border: 1px solid #999999;
+  -moz-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+  -o-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+}
+
+/* for alt-name in bell name*/
+ul.bells li span span { 
+  display: none !important;
 }
 
 #simple {
@@ -43,62 +83,17 @@ ul.bells ul li:nth-child(3) {
     font-size: 120%;
     margin-bottom: 0.5em;
 }
-#simple table.bells tr td {
-    height: 1.2em;
-    vertical-align: center;
-}
 
-#simple table.bells td .moName {
-    font-size: 60%;
-    color: #777
-}
-#simple table.bells tr td:nth-child(1) {
-    font-size: 60%;
-}
-
-#simple table.bells tr td:nth-child(3) {
-    font-size:80%;
-}
-
-#simple span.letterAndSchedule {
+#simple h3 span.letterAndSchedule {
     display: inline-block;
     float:right
 }
-#simple span.schedule {
+#simple h3 span.schedule {
     font-size: 60%;
 }
 
-#simple span.schedule_Normal {
+#simple h3 span.schedule_Normal {
     display: none;
-}
-
-
-table.bells {
-    width:100%;
-    height: 100%;
-    margin:0;
-    padding:0;
-}
-
-table.bells tr {
-    width:100%;
-    margin:0;
-    padding:0;
-    
-}
-
-table.bells tr td {
-    line-height: 150% !important;
-    height: 1.5em;
-}
-
-table.bells tr td:nth-child(1) {
-    width:8em;
-}
-
-table.bells tr td:nth-child(3) {
-    width:auto;
-    text-align:right;
 }
 
 #divProfile {
@@ -109,3 +104,74 @@ table.bells tr td:nth-child(3) {
     width: auto;
     display: inline;
 }
+
+#todo-list {
+  margin-top: 10px;
+}
+  #todo-list li {
+    padding: 12px 20px 11px 0;
+    position: relative;
+    font-size: 24px;
+    line-height: 1.1em;
+    border-bottom: 1px solid #cccccc;
+  }
+    #todo-list li:after {
+      content: "\0020";
+      display: block;
+      height: 0;
+      clear: both;
+      overflow: hidden;
+      visibility: hidden;
+    }
+    #todo-list li.editing {
+      padding: 0;
+      border-bottom: 0;
+    }
+  #todo-list .editing .display,
+  #todo-list .edit {
+    display: none;
+  }
+    #todo-list .editing .edit {
+      display: block;
+    }
+    #todo-list .editing input {
+      width: 444px;
+      font-size: 24px;
+      font-family: inherit;
+      margin: 0;
+      line-height: 1.6em;
+      border: 0;
+      outline: none;
+      padding: 10px 7px 0px 27px;
+      border: 1px solid #999999;
+      -moz-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+      -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+      -o-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+      box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+    }
+  #todo-list .check {
+    position: relative;
+    top: 9px;
+    margin: 0 10px 0 7px;
+    float: left;
+  }
+  #todo-list .done .todo-text {
+    text-decoration: line-through;
+    color: #777777;
+  }
+  #todo-list .todo-destroy {
+    position: absolute;
+    right: 5px;
+    top: 14px;
+    display: none;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    background: url(destroy.png) no-repeat 0 0;
+  }
+    #todo-list li:hover .todo-destroy {
+      display: block;
+    }
+    #todo-list .todo-destroy:hover {
+      background-position: 0 -20px;
+    }

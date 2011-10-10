@@ -1,19 +1,6 @@
 $(document).ready(function() {
 
-var TOP;
-try { TOP=window; } catch(e) { TOP={}}
-var sys;
-try {
-	debug=function() {
-        console.log(arguments)
-    }
-	
-} 
-catch (e) {
-	debug=function(msg) {
-		return;
-	}
-}
+try { debug=function() {console.log(arguments) } } catch (e) {	debug=function(msg) {return;}}
 
 //get or set dayIndex as number of days from Jan 1, 1970 UTC
 Date.prototype._setDayIndex=function(i){this.setTime(i*86400000+this.getTimezoneOffset()*60000); return this};
@@ -35,6 +22,17 @@ Date.prototype.thisMonday=function() {
     }
     return new Date(this.getTime()+offset);
 }
+Date.prototype.relativeDayPrefix=function() {
+    var objDate=this.clone().clearTime();
+    if (Date.parse('today').equals(objDate)) {
+        return "Today: ";
+    } else if (Date.parse('tomorrow').equals(objDate)) {
+        return "Tomorrow: ";
+    } else {
+        return ""
+        }
+},
+
 window.MO = (function() {
     var year = {
         // calendarDays[dateIndex]=[Letter1234, bellScheduleKey]
@@ -67,17 +65,17 @@ window.MO = (function() {
                 name: 'Default',
                 id:'Default',
                 user: {
-                    0:{name:'',block:0,moName:'TAG',showInWeek:false},
-                    1:{name:'Block 1',block:1,moName:'1(A) 2(D) 3(C)',showInWeek:true},
-                    2:{name:'Block 2',block:2,moName:'1(B) 2(A) 3(D)',showInWeek:true},
-                    3:{name:'Block 3',block:3,moName:'1(C) 2(B) 3(A)',showInWeek:true},
-                    4:{name:'Block 4',block:4,moName:'1(D) 2(C) 3(B)',showInWeek:true},
-                    5:{name:'Block 5',block:5,moName:'5(A) 6(D) 7(C)',showInWeek:true},
-                    6:{name:'Block 6',block:6,moName:'5(B) 6(A) 7(D)',showInWeek:true},
-                    7:{name:'Block 7',block:7,moName:'5(C) 6(B) 7(A)',showInWeek:true},
-                    8:{name:'Block 8',block:8,moName:'5(D) 6(C) 7(B)',showInWeek:true},
-                    'STAR':{name:'STAR',block:-1,moName:'',showInWeek:true},
-                    'Lunch':{name:'',block:-1,moName:'',showInWeek:false},
+                    0:{name:'',block:0,altName:'TAG',showInWeek:false},
+                    1:{name:'Block 1',block:1,altName:'1(A) 2(D) 3(C)',showInWeek:true},
+                    2:{name:'Block 2',block:2,altName:'1(B) 2(A) 3(D)',showInWeek:true},
+                    3:{name:'Block 3',block:3,altName:'1(C) 2(B) 3(A)',showInWeek:true},
+                    4:{name:'Block 4',block:4,altName:'1(D) 2(C) 3(B)',showInWeek:true},
+                    5:{name:'Block 5',block:5,altName:'5(A) 6(D) 7(C)',showInWeek:true},
+                    6:{name:'Block 6',block:6,altName:'5(B) 6(A) 7(D)',showInWeek:true},
+                    7:{name:'Block 7',block:7,altName:'5(C) 6(B) 7(A)',showInWeek:true},
+                    8:{name:'Block 8',block:8,altName:'5(D) 6(C) 7(B)',showInWeek:true},
+                    'STAR':{name:'STAR',block:-1,altName:'',showInWeek:true},
+                    'Lunch':{name:'',block:-1,altName:'',showInWeek:false},
                 },
                 matrix: {
                     //letter:[course in rotator 0, 1, 2, 3, 4, 5, 6]
@@ -136,8 +134,30 @@ window.MO = (function() {
         getLetter : getLetter
         }
 })() //end of MO object
-    
 
+window.BlockModel=Backbone.Model.extend({
+    localStorage: new Store('blocks'),
+    initialize: function() {
+    },
+    defaults: function() { 
+        return {
+            
+        }
+    }
+})
+
+window.BellModel=Backbone.Model.extend({
+    initialize: function() {
+    },
+    defaults: function() { 
+        return {
+        }
+    }
+})
+window.BellCollection=Backbone.Collection.extend({
+    model:  BellModel,
+    
+})
 
 window.BellringerModel=Backbone.Model.extend({
     initialize: function() {
@@ -148,6 +168,7 @@ window.BellringerModel=Backbone.Model.extend({
         this.set({
             date: MO.thisSchoolDay(),
             profile: window.defaultProfile,
+            bells: new BellCollection,
             }, {silent: true} )
         this.setLetterAndScheduleFromSchoolCalendar();
         this.updateBells();
@@ -159,7 +180,6 @@ window.BellringerModel=Backbone.Model.extend({
             schedule: MO.getSchedule(date),
             letter: MO.getLetter(date),
             Letter: ['','A','B','C','D'][MO.getLetter(date)],
-            relativeDay: this.relativeDay()
         }, {silent: true} )
         this.updateBells();
         
@@ -169,45 +189,41 @@ window.BellringerModel=Backbone.Model.extend({
             schedule: this.attributes.schedule.next
         })
     },
-    relativeDay:function() {
-        var objDate=this.get('date');
-        if (Date.parse('today').equals(objDate)) {
-            return "Today: ";
-        } else if (Date.parse('tomorrow').equals(objDate)) {
-            return "Tomorrow: ";
-        } else {
-            return ""
-            }
-    },
     updateBells: function() {
         var rtn=[];
         var name, block, section;
+        var date=this.get("date")
         var schedule=this.get("schedule")
         var profile=this.get("profile").attributes
         var letter=this.get("letter")
+        var bells=new BellCollection() //a collection of BellModel objects now
+
+
         //debug("schedule",schedule);
         //debug("schedule.items",schedule.items);
+
         for (var i in schedule.items) {
             period=schedule.items[i];
-            bell={
-                name:period[0],
-                start:period[1],
-                len:period[2]
-            };
+            name=period[0];
             
-            //add block information to rotator, or empty block info
-            bell.block=profile.user[profile.matrix[letter][bell.name]] //rotator from user info
-                || profile.user[bell.name] // or course from user info
-                || {name:bell.name,moName:bell.name,block:-1}; //or a fake non-block
-            
-            bell.end=bell.start+bell.len;
+            var bell = new BellModel ({
+                name:   name,
+                start:  date.clone().clearTime().addMinutes(period[1]),
+                len:    period[2],
+                block:  profile.user[profile.matrix[letter][name]] //block by rotator from user info
+                        || profile.user[name] // or fixed block from user info
+                        || {name:name, block:-1}, //or a fake non-block
+                order:  bells.length+1
+            });
+                       
+            bell.set({end:bell.get("start").clone().addMinutes(bell.get('len'))})
             //human times
-            bell.Start=function(t){return (t<10*60?" ":"")+parseInt(t/60)+":"+(t%60<10?"0":"")+parseInt(t % 60)}(bell.start)
-            bell.End=function(t){return (t<10*60?" ":"")+parseInt(t/60)+":"+(t%60<10?"0":"")+parseInt(t % 60)}(bell.end)
-            rtn[rtn.length]=bell;
+            //bell.Start=function(t){return (t<10*60?" ":"")+parseInt(t/60)+":"+(t%60<10?"0":"")+parseInt(t % 60)}(bell.start)
+            //bell.End=function(t){return (t<10*60?" ":"")+parseInt(t/60)+":"+(t%60<10?"0":"")+parseInt(t % 60)}(bell.end)
+            bells.add(bell)
         }
-        this.set({bells: rtn});
-        return rtn;
+        this.set({bells: bells});
+        return bells;
     },
     status: function(day, timeDateObj) {
         rtn={}
@@ -236,18 +252,18 @@ chrisProfile.set({
     id:"Chris DAmato",
     user: {
         name:"Chris D'Amato",
-        0:{name:'',block:0,moName:''},
-        1:{name:'Physics First 1',block:1,moName:'',showInWeek:true},
-        2:{name:'Study Hall',block:2,moName:''},
-        3:{name:'Physics 3',block:3,moName:'',showInWeek:true},
-        4:{name:'Library',block:4,moName:')'},
-        'Lunch': {name:'',block:-1,moName:'',showInWeek:true},
-        5:{name:'Prep',block:5,moName:'',showInWeek:true},
-        6:{name:'Physics First 6',block:6,moName:'',showInWeek:true},
-        7:{name:'Physics First 7',block:7,moName:'',showInWeek:true},
-        8:{name:'Physics First 8',block:8,moName:'',showInWeek:true},
-        9:{name:'PLC',block:-1,moName:'',showInWeek:true},
-        'STAR':{name:'STAR',block:-1,moName:'',showInWeek:true},
+        0:{name:'',block:0,altName:''},
+        1:{name:'Physics First 1',block:1,altName:'',showInWeek:true},
+        2:{name:'Study Hall',block:2,altName:''},
+        3:{name:'Physics 3',block:3,altName:'',showInWeek:true},
+        4:{name:'Library',block:4,altName:''},
+        'Lunch': {name:'',block:-1,altName:'',showInWeek:true},
+        5:{name:'Prep',block:5,altName:'',showInWeek:true},
+        6:{name:'Physics First 6',block:6,altName:'',showInWeek:true},
+        7:{name:'Physics First 7',block:7,altName:'',showInWeek:true},
+        8:{name:'Physics First 8',block:8,altName:'',showInWeek:true},
+        9:{name:'PLC',block:9,altName:'',showInWeek:true},
+        'STAR':{name:'STAR',block:-1,altName:'',showInWeek:true},
         },
     });
 chrisProfile.attributes.matrix[3].AM2=9;
@@ -257,22 +273,78 @@ chrisProfile.attributes.matrix[3].AM2=9;
 
 
 window.DayView = Backbone.View.extend({
-    tagName: "div",
-    template: _.template($("#tmplDay").html()),
+    tagName: "div#simple",
     events: {
-        "click .letterAndSchedule"     : "incrementSchedule"
+        "click .letterAndSchedule"     : "incrementSchedule",
+        // "dblclick .name"               : "editBlock"
         },
     initialize: function() {
         this.model.bind("change", this.render, this)
         },
     render: function() {
-        $(this.el).html(this.template(this.model.toJSON()));
+        var html=_.template($("#schedule-heading-template").html(),this.model.toJSON());
+        $(this.el).html(html);
+        _.each(this.model.get('bells').models,function(model) {
+            // var newEl=$("")
+            var view=new BellView( { model:model } );
+            this.$("table").append(view.render().el)
+            }
+            , this
+        )
         return this;
         },
     incrementSchedule: function() {
         this.model.nextSchedule()
+    },
+    editBlock: function (evt) {
+        console.log(evt)
     }
     })
+    
+window.BellView = Backbone.View.extend({
+    tagName: "tr",
+    template: _.template($("#bell-item").html()),
+    events: {
+        "dblclick .name" : "edit",
+        "keypress .name-edit"      : "updateOnEnter"
+    },
+    initialize: function() {
+        this.model.bind("change", this.render, this)
+    },
+    render: function() {
+        var block=this.model.get('block');
+        $(this.el)
+            .html( this.template( this.model.toJSON() ) )
+            .attr( "class", "bell-item " +  
+                (block.block>0 
+                    ? "block block"+block.block 
+                    : block.name.replace(" ","_")
+                ) 
+            )
+        // this.el=$( this.template( this.model.toJSON() ) );
+        this.input = this.$('input');
+        this.input.bind('blur', _.bind(this.close, this)).val(block.name);
+        return this;
+    },
+    foo: function() {
+        alert("ding")
+    },
+    edit: function() {
+      $(this.el).addClass("editing");
+      this.input.focus();
+    },
+    close: function() {
+      this.model.get('block').name=this.input.val();
+      this.model.change();
+      $(this.el).removeClass("editing");
+      thisdayModel.get('profile').save();
+      console.log(this.model)
+    },
+    updateOnEnter: function(e) {
+      if (e.keyCode == 13) this.close();
+    },
+
+})
     
 window.WeekModel = Backbone.Model.extend({
     initialize: function() {
@@ -288,27 +360,11 @@ window.WeekModel = Backbone.Model.extend({
             date: window.thisdayModel.get('date')
             }
         }
-    
 })
-window.WeekView = Backbone.View.extend({
-    tagName: "div",
-    template: _.template($("#tmplWeek").html()),
-    events: {
-        },
-    initialize: function() {
-        this.model.bind("change", this.render, this)
-        },
-    render: function() {
-        $(this.el).html(this.template(this.model.toJSON()));
-        return this;
-        }
-    })
     
 window.AppView = Backbone.View.extend({
     el: $('#app')
-    
 })
-
 
 window.ProfileOptionView = Backbone.View.extend({
     model:Profile,
@@ -326,6 +382,7 @@ window.ProfileOptionView = Backbone.View.extend({
     }
 });
 
+//profile selection view
 window.ProfileSelectView = Backbone.View.extend({
     collection: Profiles,
     //template: _.template(),
@@ -355,39 +412,34 @@ window.ProfileSelectView = Backbone.View.extend({
         this.el.val(selection);
         }
 })
-    
-    
-    //viewChris=new DayView({model:thisdayModel,el:$('#chrisDay')})
+viewSelectProfile=new window.ProfileSelectView({
+    collection: Profiles,
+    el:$("#selectProfile")
+    })
+Profiles.add(chrisProfile);
+Profiles.add(defaultProfile);
+Profiles.fetch( {add: true} );
 
-    viewSelectProfile=new window.ProfileSelectView({
-        collection: Profiles,
-        el:$("#selectProfile")
-        })
+window.thisdayModel=new window.BellringerModel( );
 
-    Profiles.add(chrisProfile);
-    Profiles.add(defaultProfile);
-    Profiles.fetch( {add: true} );
-    
-    window.thisdayModel=new window.BellringerModel( );
-    
-    var initialProfile=Profiles.get(localStorage.initialProfile) || Profiles.at(0)
-    thisdayModel.set({profile:initialProfile})
-    //thisdayModel.set(  { date:undefined } ) //set to the next school day
-    
-    viewSimple=new DayView( {
-        model: thisdayModel,
-        el: $("#simple")
-        } )        
-    viewSimple.render()
-    
-    thisweekModel=new window.WeekModel();
-    
+var initialProfile=Profiles.get(localStorage.initialProfile) || Profiles.at(0)
+thisdayModel.set({profile:initialProfile})
+//thisdayModel.set(  { date:undefined } ) //set to the next school day
+
+viewSimple=new DayView( {
+    model: thisdayModel,
+    el: $("#simple")
+    } )        
+viewSimple.render()
+
+//thisweekModel=new window.WeekModel();
+
 //    viewPlanner=new PlannerView( {
- //       model: thisWeekModel,
-  //      el: $("#thisWeek")
-   // })
-    //viewPlanner.render()
-    
-    viewSelectProfile.render()
+//       model: thisWeekModel,
+//      el: $("#thisWeek")
+// })
+//viewPlanner.render()
+
+viewSelectProfile.render()
     
 });

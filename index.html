@@ -62,9 +62,10 @@
         </div>
         <div class="sixteen columns">
             <!-- Standard <ul> with class of "tabs" -->
-            <ul class="tabs" style="display:none">
+            <ul class="tabs" style="display:">
               <!-- Give href an ID value of corresponding "tabs-content" <li>'s -->
               <li><a class="active"  href="#simpleTab">Today</a></li>
+              <li><a href="#anotherTab">Today</a></li>
               <li><a href="#plannerTab">Planner</a></li>
               <li><a href="#general">Countdown</a></li>
               <li><a href="#other">Other</a></li>
@@ -76,6 +77,13 @@
                 <li class="active" id="simpleTab">
                     <div class="twelve columns offset-by-two">
                         <div id="simple">
+                        </div>
+                    </div>
+                </li>
+                <li class="" id="anotherTab">
+                    <div class="twelve columns offset-by-two">
+                        <div id="another">
+                            <ul id="bell-list"></ul>
                         </div>
                     </div>
                 </li>
@@ -107,48 +115,61 @@
     
     <!-- underscore-based templates -->
 
-    <script id="tmplDay" type="text/x-underscore-tmpl">
-        <h3 class='day'><span class='dayname'> <%= relativeDay + date.toString("dddd M/d") %></span> 
-            <span class="letterAndSchedule"><span class="schedule schedule_<%= schedule.name.replace(" ","_") %>"><%= schedule.name %></span> <span class="letter letter_<%= Letter %>"><%= Letter %></span></span></h3>
-        <table class='bells'>
-                <% _.each(bells,function(b) { %>
-                <tr>
-                    <td class="label"><%= b.name %></td>
-                    <td class="name"><%= b.block.name || "" %> <span class="moName"><%= b.block.moName %></span></td>
-                    <td class="time"><%= b.Start %> - <%= b.End %></td>
-                </tr>
-                <% }); %>
-    </script>
-
-    <script id="UL-tmplDay" type="text/x-underscore-tmpl">
-        <h3 class='day'><span class='dayname'> <%= relativeDay() + date.toString("dddd M/d") %></span> 
-            <span class="schedule"><%= Letter %></span></h3>
-        <ul class='bells'>
-                <% _.each(bells,function(b) { %>
-                <ul>
-                    <li class="label"><%= b.name %></li>
-                    <li class="name"><%= b.block.name || "" %></li>
-                    <li class="time"><%= b.Start %> - <%= b.End %></li>
-                </ul>
-                <% }); %>
-        </ul>
-    </script>
-
-    <script id="tmplWeek" type="text/x-underscore-tmpl">
-        <div class="three columns">
-        <h4><%= date.toString("ddd M/d") %> <span class="schedule"><%= Letter %></span></h4>
-        <ul class='week'>
-            <% _.each(bells,function(b) { if (b.block.showInWeek) { %>
-                <ul>
-                    <li class="label"><%= b.name %></li>
-                    <li class="name"><%= b.block.name || "" %></li>
-                </ul>
-                <% } else if (b.block.name=='Lunch') { %>
-                    <hr class='lunch'/>
-                    <% } }); %>
-        </div>
+    <script id="schedule-heading-template" type="text/template">
+        <h3 class='day'>
+            <span class='date'><%= date.relativeDayPrefix() + date.toString("dddd M/d")%></span>
+            <span class='letterAndSchedule'>
+                <span class='schedule schedule_<%= schedule.name.replace(" ","_") %>'><%= schedule.name %></span>
+                <span class='letter'><%= Letter %></span>
+            </span>
+        </h3>
+        <div><table id="schedule-bells" class="bells <%= date.relativeDayPrefix() %>"></table></div>
     </script>
     
+    <script id="bell-item" type="text/template">
+            <td class="label"><%= name %></td>
+            <td class="name">
+                <div class='display'>
+                    <%= block.name || "" %>
+                    <span class="altName"><%= block.altName %></span>
+                </div>
+                <div class='edit'>
+                    <input class="name-edit" type="text" value>
+                </div>
+            </td>
+            <td class="time"><%= start.toString("H:mm") %> - <%= end.toString("H:mm") %></td>
+    </script>
+
+    <script id="block-template" type="text/template">
+        <li>
+        <div class="block-container">
+            <div class="label"><%= name %></div>
+            <div class="name <%= (block.block>0?"block"+block.block:"") %> ">
+                <div class="display">
+                    <%= block.name || "" %> <span class="altName"><%= block.altName %></span>
+                    <span class="block-reset"></span>
+                </div>
+                <div class="edit">
+                    <input class="block-input" type="text" value=""/>
+                </div>
+            </td>
+            <td class="time"><%= b.Start %> - <%= b.End %></td>
+        </div>
+        </li>
+    </script>
+
+    <script type="text/template" id="item-template"> 
+      <div class="todo <%= done ? 'done' : '' %>">
+        <div class="display">
+          <input class="check" type="checkbox" <%= done ? 'checked="checked"' : '' %> />
+          <div class="todo-text"></div>
+          <span class="todo-destroy"></span>
+        </div>
+        <div class="edit">
+          <input class="todo-input" type="text" value="" />
+        </div>
+      </div>
+    </script> 
     
     
 
