@@ -44,21 +44,12 @@
 	<!-- Delete everything in this .container and get started on your own site! -->
 
 	<div id="app" class="container">
-        <div class="sixteen columns">
-            <h3 class="remove-bottom" style="margin-top: 16px">Quasimodo</h3>
-        </div>
         <div class="ten columns">
+            <h3 class="remove-bottom" style="margin-top: 16px">Quasimodo</h3>
             <h5 class="add-bottom">Quick and simple Mount Olive daily organizer</h5>
         </div>
-        <div class="six columns" id="divProfile">
-            
-            <form id="formProfile" action="">
-                <span style="color:#777">Ring the bells for </span>
-                <select id="selectProfile">
-                    <option value="blank">Ring the bells for ...</option>
-                </select>
-              <!-- Label and select list -->
-            </form>
+        <div class="six columns" id="divClock">
+            <div id="clock">5:00</div>
         </div>
         <div class="sixteen columns">
             <!-- Standard <ul> with class of "tabs" -->
@@ -117,18 +108,20 @@
 
     <script id="schedule-heading-template" type="text/template">
         <h3 class='day'>
+            <span class='prev'></span>
             <span class='date'><%= date.relativeDayPrefix() + date.toString("dddd M/d")%></span>
             <span class='letterAndSchedule'>
                 <span class='schedule schedule_<%= schedule.name.replace(" ","_") %>'><%= schedule.name %></span>
                 <span class='letter'><%= Letter %></span>
             </span>
+            <span class='next'></span>
         </h3>
         <div><table id="schedule-bells" class="bells <%= date.relativeDayPrefix() %>"></table></div>
     </script>
     
     <script id="bell-item" type="text/template">
             <td class="label"><%= name %></td>
-            <td class="name">
+            <td class="name" onclick = "void(0)">
                 <div class='display'>
                     <%= block.name || "" %>
                     <span class="altName"><%= block.altName %></span>
@@ -182,6 +175,7 @@
 	<script src="javascripts/backbone.localStorage.js"></script>
 	<script src="javascripts/date.js"></script>
     
+    <script src="mo.js"></script>
     <script src="quasimodo.js"></script>
 
 <!-- End Document
