@@ -1,0 +1,31 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>mo nice</title>
+
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <!-- // <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> -->
+
+    <!-- <script src="javascripts/date.js"></script> -->
+    <script src="mo-nice.js"></script>
+
+    <script type="text/javascript">
+        d=new Date();
+        window.onload = function() {
+            document.body.appendChild(document.createElement("p")).innerText=d.toString("dddd, MMMM d, H:mm");
+            document.body.appendChild(document.createElement("p")).innerText=d.getStatus().description;
+
+            d.getBells().forEach( function(bell) {
+                document.body.appendChild(document.createElement("p")).innerText = bell.period
+                    + (bell.block?bell.block.name:"")
+
+            })
+    }
+    
+    </script>
+</head>
+<body>
+</body>
+
+</html>
